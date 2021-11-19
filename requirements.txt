@@ -1,6 +1,5 @@
 # requirements.txt
 Flask
 Flask_Bootstrap
-flask-nav
 redis>=4.0
 uwsgi

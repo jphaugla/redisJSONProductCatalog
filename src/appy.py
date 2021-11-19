@@ -2,17 +2,16 @@
 from flask import Flask, jsonify
 from flask_bootstrap import Bootstrap
 from flask import request
-from flask_nav import Nav
-from flask_nav.elements import Navbar, View
 import redis
-import time
+from redis.commands.json.path import Path
 from redis import ResponseError
+from Product import Product
 
 from os import environ
 
 from redis.commands.search.field import TextField, TagField, NumericField
 from redis.commands.search.indexDefinition import IndexDefinition, IndexType
-from redis.commands.search import Search
+
 
 app = Flask(__name__)
 app.debug = True
@@ -36,9 +35,9 @@ print("beginning of appy.py now")
 
 categoryDefinition = IndexDefinition(prefix=['Category:'], index_type=IndexType.JSON)
 categorySCHEMA = (
-    TextField("$.lowpic", as_name='lowpic'),
-    TextField("$.thumbpic", as_name='thumbpic'),
-    TextField("$.name", as_name='name')
+    TextField("$.LowPic", as_name='LowPic'),
+    TextField("$.ThumbPic", as_name='ThumbPic'),
+    TextField("$.Name", as_name='Name')
 )
 
 productDefinition = IndexDefinition(prefix=['mprodid:', 'prodid:'], index_type=IndexType.JSON)
@@ -89,12 +88,6 @@ def isInt(s):
     except ValueError:
         return False
 
-nav = Nav()
-topbar = Navbar('',
-                View('Home', 'index'),
-                View('Aggregations', 'show_agg'),
-                )
-nav.register_element('top', topbar)
 
 @app.route('/', defaults={'path': ''}, methods=['PUT', 'GET'])
 @app.route('/<path:path>', methods=['PUT', 'GET', 'DELETE'])
@@ -106,18 +99,12 @@ def home(path):
         print('in PUT')
         event = request.json
         print('event is %s ' % event)
-        if path == 'NEW':
-            prod_idx = str(db.incr("prod_highest_idx"))
-            path = "prod:" + str(prod_idx)
-            print("insert-new index is " + path)
-        else:
-            db.delete(path)  # remove old keys
-            print("prod_idx exists so is a replace")
-        event['updated'] = int(time.time())
-        event['prod_idx'] = path
+        nextProduct = Product(**event)
+        nextProduct.set_key()
+        # event['updated'] = int(time.time())
         # db.hmset(path, event)
-        db.json().set(path, event)
-        return_string = jsonify(event, 201)
+        db.json().set(nextProduct.key_name, Path.rootPath(), nextProduct.__dict__)
+        return_string = jsonify(nextProduct.__dict__, 201)
 
     elif request.method == 'DELETE':
         return_status = db.delete(path)
@@ -127,46 +114,42 @@ def home(path):
     elif request.method == 'GET':
         print("GET Method with path " + path)
         if path == 'search':
+            search_column = request.args.get("search_column")
+            print("search column is " + search_column)
             search_str = request.args.get("search_string")
-            print("search string is ", search_str)
-            product_list = db.smembers("ProductModel:" + search_str)
-            product_results = []
-            for prod in product_list:
-                print("prod is " + prod)
-                product_record = db.hgetall(prod)
-                product_results.append(product_record)
-            return_string = jsonify(product_results, 200)
-
-        # category passed in will be Category name, need to get the category index and pull products with category index
+            print("search string is " + search_str)
+            productSearch = "@" + str(search_column) + ":" + str(search_str)
+            print("productSearch is " + productSearch)
+            productReturn = db.ft(index_name="Product").search(productSearch)
+            print("number returned is " + str(productReturn.total))
+            print(productReturn)
+            print(productReturn.docs)
+            print(productReturn.docs[0])
+            print(productReturn.docs[0].json)
+            productResults =[]
+            for i in range(min(productReturn.total-1, 9)):
+                print(str(i))
+                print(productReturn.docs[i])
+                print(productReturn.docs[i].json)
+                productResults.append(productReturn.docs[i].json)
+            return_string = jsonify(productResults,200)
+        # category passed in will be Category name, return Category attributes
         elif path == 'category':
             get_category = request.args.get("show_category")
             print("reporting category is ", get_category)
             #  retrieve the category index using the passed in category name
             #  pull this from the zCategoryName sorted set holding category name and category id separated by colon
-            category_key = "CategIDX:" + get_category
-            product_list = db.smembers(category_key)
-            product_results = []
-            # print("product list is\n")
-            # print(product_list)
-            for prod in product_list:
-                # print("prod is " + prod)
-                # product_name = db.hget(prod, "model_name")
-                product_record = db.hgetall(prod)
-                product_results.append(product_record)
-            return_string = jsonify(product_results, 200)
+            catSearch = "@Name:" + get_category
+            catReturn = db.ft(index_name="Category").search(catSearch)
+            print("number returned is " + str(catReturn.total))
+            print(catReturn)
+            print(catReturn.docs)
+            print(catReturn.docs[0])
+            print(catReturn.docs[0].json)
+            return_string = catReturn.docs[0].json
 
         elif not db.exists(path):
             return_string = "Error: thing doesn't exist"
-
-        else:
-            event = db.hgetall(path)
-            print("got event back" + str(event))
-            # put path in as product index
-            event["prod_idx"] = path
-            # cast integers accordingly, nested arrays, dicts not supported for now  :(
-            dict_with_ints = dict((k,int(v) if isInt(v) else v) for k, v in event.items())
-            # return json.dumps(dict_with_ints), 200
-            return_string = jsonify(dict_with_ints, 200)
 
     return return_string
 

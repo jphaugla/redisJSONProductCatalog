@@ -1,0 +1,6 @@
+ft.search Product "@catid:889" 
+ft.search Product "@catid:889" return 1 product_id
+# returns only the keyname
+ft.search Product "@catid:889" NOCONTENT
+ft.search Product "@m_supplier_name:LEXMARK" 
+ft.search Product "@m_supplier_name:LEXMARK @country_market:{GB}" return 3 country_market m_supplier_name  model_name 

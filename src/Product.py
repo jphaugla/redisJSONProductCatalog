@@ -31,13 +31,13 @@ class Product(object):
         return str(self.__dict__)
 
     def set_key(self):
-            m_product_string = "mprodid:" + self.m_prod_id
-            p_product_string = "prodid:" + self.product_id
+            m_product_string = "mprodid:" + str(self.m_prod_id)
+            p_product_string = "prodid:" + str(self.product_id)
             # supply
             if self.m_supplier_id and not self.m_supplier_id.isspace():
-                supplier_string = ":msupplyid:" + self.m_supplier_id
+                supplier_string = ":msupplyid:" + str(self.m_supplier_id)
             else:
-                supplier_string = ":supplyid:" + self.supplier_id
+                supplier_string = ":supplyid:" + str(self.supplier_id)
             # product
             if self.prod_id and not self.prod_id.isspace():
                 product_string = m_product_string + ":" + p_product_string

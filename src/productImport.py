@@ -46,12 +46,10 @@ def main():
             prod_idx += 1
             nextProduct = Product(**row)
             category_id = 'Category:' + nextProduct.catid
-            categ_name = conn.json().jsonget(category_id, "Name")
+            categ_name = conn.json().get(category_id, "Name")
             nextProduct.set_category_name(categ_name)
             nextProduct.set_key()
             # print("before write of product " + str(nextProduct.product_id) + " " + nextProduct.key_name)
-            # conn.hset(nextProduct.key_name, mapping=nextProduct.__dict__)
-            #  lets try writing this as JSON
             conn.json().set(nextProduct.key_name, Path.rootPath(), nextProduct.__dict__)
             # 0)path 1)product_id 2)updated 3)quality 4)supplier_id 5)prod_id 6)catid 7)m_prod_id 8)ean_upc 9)on_market
             # 10)country_market 11)model_name 12)product_view 13)high_pic 14)high_pic_size

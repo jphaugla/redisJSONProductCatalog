@@ -1,6 +1,8 @@
 #!/bin/python
 import xml.etree.ElementTree as ET
 import redis
+import json
+
 from redis.commands.json.path import Path
 from os import environ
 
@@ -24,6 +26,7 @@ def main():
         redis_port = 13000
         print("no passed in redis port variable ")
 
+    # conn = redis.StrictRedis(redis_server, redis_port)
     conn = redis.StrictRedis(redis_server, redis_port, charset="utf-8", decode_responses=True)
     with open('/Users/jason/gits/redisJSONProductCatalog/data/CategoriesList.xml') as xml_file:
         # create element tree object
@@ -64,18 +67,19 @@ def main():
                 if cat_child.tag == 'Name' and cat_child.attrib['langid'] == '1':
                     cat_name = cat_child.attrib['Value']
                     # print("category name is " + cat_name)
-                    next_category.set_category_name(cat_name)
+                    next_category.set_category_name(str(cat_name))
                     # print("category name is " + next_category.Name)
                 elif cat_child.tag == 'ParentCategory' and cat_id != "1":
                     parent_cat_id = cat_child.attrib['ID']
-                    next_category.ParentCategoryID = parent_cat_id
+                    next_category.ParentCategoryID = str(parent_cat_id)
                     # print("parent_cat_id is " + parent_cat_id)
                     for parent_child in cat_child:
                         # print("parent_child is " + str(parent_child))
                         for name in parent_child:
                             # print("name under parent child is " + str(name))
                             if name.tag == 'Name' and name.attrib['langid'] == '1':
-                                next_category.ParentCategoryName = name.attrib['Value']
+                                next_category.ParentCategoryName = str(name.attrib['Value'])
+                    # this is hash write
                     # conn.hset(next_category.get_key(), mapping=next_category.__dict__)
                     conn.json().set(next_category.get_key(), Path.rootPath(), next_category.__dict__)
             if cat_cntr % 1000 == 0:
