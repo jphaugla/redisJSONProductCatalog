@@ -1,18 +1,20 @@
 #!/bin/python
 
 import csv
+import time
+
 import redis
 from redis.commands.json.path import Path
 import sys
 import datetime
 from os import environ
+import os.path
+from multiprocessing import Pool
 
 from Product import Product
 from Category import Category
 
 maxInt = sys.maxsize
-
-REDIS_HOST = 'redis'
 
 
 def main():
@@ -20,6 +22,25 @@ def main():
     # print("PID %d: initializing redis pool..." % os.getpid())
     # redis_pool = redis.ConnectionPool(host='localhost', port=6379, db=0)
     print("Starting productimport.py at " + str(datetime.datetime.now()))
+    startTime = time.time()
+    if environ.get('INDEX_FILE_LOCATION') is not None:
+        index_file_location = (environ.get('INDEX_FILE_LOCATION'))
+        print("passed in index file location " + index_file_location)
+    else:
+        index_file_location = "../data/index/"
+        print("no passed in index file location ")
+
+    print("process_files_parallel()" + str(startTime))
+    for (dirpath, dirnames, filenames) in os.walk(index_file_location):
+        print("dirpath=" + dirpath)
+        print(dirnames)
+        print(filenames)
+        process_files_parallel("start", dirpath, filenames)
+
+
+def process_file(file_name):
+
+    print("starting process_file with file name " + file_name)
     if environ.get('REDIS_SERVER') is not None:
         redis_server = environ.get('REDIS_SERVER')
         print("passed in redis server is " + redis_server)
@@ -33,18 +54,8 @@ def main():
     else:
         redis_port = 13000
         print("no passed in redis port variable ")
-
-    if environ.get('INDEX_FILE_LOCATION') is not None:
-        index_file_location = (environ.get('INDEX_FILE_LOCATION'))
-        print("passed in index file location " + index_file_location)
-    else:
-        index_file_location = "../data/files.index.csv"
-        print("no passed in index file location ")
-
-    conn = redis.StrictRedis(host=redis_server, port=redis_port, db=0, charset="utf-8", decode_responses=True)
-
-    #  open the file to read as csv
-    with open(index_file_location) as csv_file:
+    conn = redis.StrictRedis(host = redis_server, port=redis_port, db=0, charset="utf-8", decode_responses=True)
+    with open(file_name) as csv_file:
         # file is tab delimited
         csv_reader = csv.DictReader(csv_file, delimiter='\t', quoting=csv.QUOTE_NONE)
         prod_idx = 0
@@ -79,12 +90,22 @@ def main():
             #     # print("model key is " + model_key)
             #     conn.sadd(model_key, nextProduct.key_name)
             if prod_idx % 10000 == 0:
-                print(str(prod_idx) + " rows loaded")
+                print(str(prod_idx) + " rows loaded from file ")
         csv_file.close()
         print(str(prod_idx) + " rows loaded")
         conn.set("prod_highest_idx", prod_idx)
     print("Finished productimport.py at " + str(datetime.datetime.now()))
 
+
+def process_files_parallel(arg, dirname, names):
+    # Process each file in parallel via Poll.map()
+    print("starting process_files_parallel")
+    pool = Pool()
+    results = pool.map(process_file, [os.path.join(dirname, name) for name in names])
+
+def process_files(arg, dirname, names):
+    ''' Process each file in via map() '''
+    results = map(process_file, [os.path.join(dirname, name) for name in names])
 
 if '__main__' == __name__:
     main()
