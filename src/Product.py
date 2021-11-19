@@ -24,6 +24,7 @@ class Product(object):
         self.Date_Added = ""
         self.key_name = ""
         self.category_name = ""
+        self.parent_category_name = ""
         for key in kwargs:
             setattr(self, key, kwargs[key])
 
@@ -44,6 +45,9 @@ class Product(object):
             else:
                 product_string = "prodid:" + self.product_id
             self.key_name = product_string + supplier_string
+
+    def set_parent_category_name(self, parent_category_name):
+        self.parent_category_name = str(parent_category_name)
 
     def set_category_name(self, category_name):
         self.category_name = str(category_name)

@@ -8,6 +8,7 @@ import datetime
 from os import environ
 
 from Product import Product
+from Category import Category
 
 maxInt = sys.maxsize
 
@@ -47,7 +48,14 @@ def main():
             nextProduct = Product(**row)
             category_id = 'Category:' + nextProduct.catid
             categ_name = conn.json().get(category_id, "Name")
+            # parent_categ_name = conn.json().get(category_id,"ParentCategoryName")
+            getAll = conn.json().get(category_id)
+            # print(getAll)
+            thisCategory = Category(**getAll)
+            categ_name = thisCategory.Name
+            parent_category_name = thisCategory.ParentCategoryName
             nextProduct.set_category_name(categ_name)
+            nextProduct.set_parent_category_name(parent_category_name)
             nextProduct.set_key()
             # print("before write of product " + str(nextProduct.product_id) + " " + nextProduct.key_name)
             conn.json().set(nextProduct.key_name, Path.rootPath(), nextProduct.__dict__)

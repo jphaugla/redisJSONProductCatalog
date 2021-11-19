@@ -62,7 +62,8 @@ productSCHEMA = (
     # NumericField("$.high_pic_size", as_name='high_pic_size'),
     TagField("$.ean_upc_is_approved", separator=";", as_name='ean_upc_is_approved'),
     TextField("$.Date_Added", as_name='date_added'),
-    TextField("$.category_name", as_name='category_name')
+    TextField("$.category_name", as_name='category_name'),
+    TextField("$.parent_category_name", as_name='parent_category_name')
 )
 
 print("before try on product")
