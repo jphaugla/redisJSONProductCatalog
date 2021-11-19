@@ -26,9 +26,15 @@ def main():
         redis_port = 13000
         print("no passed in redis port variable ")
 
+    if environ.get('CATEGORY_FILE_LOCATION') is not None:
+        category_file_location = (environ.get('CATEGORY_FILE_LOCATION'))
+        print("passed in category file location " + category_file_location)
+    else:
+        category_file_location = "../data/CategoriesList.xml"
+        print("no passed in category file location ")
     # conn = redis.StrictRedis(redis_server, redis_port)
     conn = redis.StrictRedis(redis_server, redis_port, charset="utf-8", decode_responses=True)
-    with open('/Users/jason/gits/redisJSONProductCatalog/data/CategoriesList.xml') as xml_file:
+    with open(category_file_location) as xml_file:
         # create element tree object
         tree = ET.parse(xml_file)
 

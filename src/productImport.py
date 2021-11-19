@@ -34,10 +34,17 @@ def main():
         redis_port = 13000
         print("no passed in redis port variable ")
 
+    if environ.get('INDEX_FILE_LOCATION') is not None:
+        index_file_location = (environ.get('INDEX_FILE_LOCATION'))
+        print("passed in index file location " + index_file_location)
+    else:
+        index_file_location = "../data/files.index.csv"
+        print("no passed in index file location ")
+
     conn = redis.StrictRedis(host=redis_server, port=redis_port, db=0, charset="utf-8", decode_responses=True)
 
     #  open the file to read as csv
-    with open('/Users/jason/gits/redisJSONProductCatalog/data/files.index.csv') as csv_file:
+    with open(index_file_location) as csv_file:
         # file is tab delimited
         csv_reader = csv.DictReader(csv_file, delimiter='\t', quoting=csv.QUOTE_NONE)
         prod_idx = 0
