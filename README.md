@@ -23,7 +23,11 @@ This is an implementation of a product Catalog using data download from
 * To download the datafiles, a free login id from icecat is required.
 * Once effectively registed to icecat need to retrieve these two files using the registered username and password.  The quotes are needed.
 ```bash
+mkdir data
+cd data
 curl -u 'yourUN':'yourPW' https://data.Icecat.biz/export/freexml/refs/CategoriesList.xml.gz -o CategoriesList.xml.gz
+mkdir index
+cd index
 curl -u 'yourUN':'yourPW' https://data.Icecat.biz/export/freexml/files.index.csv.gz -o files.index.csv.gz
 ```
 
@@ -31,11 +35,10 @@ curl -u 'yourUN':'yourPW' https://data.Icecat.biz/export/freexml/files.index.csv
 The data file directory is mapped 
 using docker-compose volume to /data in flask container
 ```bash
-mkdir data
-mkdir data/index
-cd data/index
-gunzip files.index.csv.gz
+cd data
 gunzip CategoriesList.xml.gz
+cd index
+gunzip files.index.csv.gz
 ```
 ### Set environment
 The docker compose file has the environment variables set for the redis connection and the location of the data files.
@@ -77,7 +80,11 @@ So, the tests not to be run should be commented out.
 ./scripts/sampleput.sh
 ```
   * run sample search queries   
-run sample redisearch queries as provided.  Run one at a time using scripts/searchQueries.txt
+run sample redisearch queries as provided.  Run one at a time using
+
+```bash
+redic-cli -f scripts/searchQueries.txt
+```
 
 ##  Notes for running outside of Docker
 Follow most of the same steps as above with some changes
@@ -90,10 +97,11 @@ python3 -m venv venv
 source venv/bin/activate
 ```
    * Use an environment file for locations
+
 ```bash
 source scripts/app.env
 ```
-    * execute pythong scripts from the src directory
+  * execute python scripts from the src directory
 ```bash
 cd src
 pip install -r requirements.txt
@@ -101,6 +109,7 @@ python categoryImport.py
 python productImport.py
 python app.py
 ```
+
 ###  installing on mac
 1. install xcode
 2. install homebrew
