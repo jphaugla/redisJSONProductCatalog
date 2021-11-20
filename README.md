@@ -8,6 +8,8 @@ get clone https://github.com/jphaugla/redisPythonProductCatalog.git
 Two options for setting the environment are given:  
   * run with docker-compose using a flask and redis container
   * installing for mac os
+  * running on linux (probably in the cloud)
+
 docker-compose is much easier and is main method documented here
 ## docker compose startup
 ```bash
@@ -18,27 +20,47 @@ This is an implementation of a product Catalog using data download from
  [icecat](https://iceclog.com/open-catalog-interface-oci-open-icecat-xml-and-full-icecat-xml-repositories/)
 
 ### Download the datafiles to the data subdirectory
-To download the datafiles, a free login id from icecat is required
-Once effectively logged in to icecat need to retrieve these two files
-  * https://data.Icecat.biz/export/freexml/refs/CategoriesList.xml.gz
-  * https://data.icecat.biz/export/freexml/nl/files.index.xml.gz
+* To download the datafiles, a free login id from icecat is required.
+* Once effectively registed to icecat need to retrieve these two files using the registered username and password.  The quotes are needed.
+```bash
+curl -u 'yourUN':'yourPW' https://data.Icecat.biz/export/freexml/refs/CategoriesList.xml.gz -o CategoriesList.xml.gz
+curl -u 'yourUN':'yourPW' https://data.Icecat.biz/export/freexml/files.index.csv.gz -o files.index.csv.gz
+```
 
 ### unzip data files
 The data file directory is mapped 
 using docker-compose volume to /data in flask container
 ```bash
-cd data
-unzip files.index.csv.zip
+mkdir data
+mkdir data/index
+cd data/index
+gunzip files.index.csv.gz
 gunzip CategoriesList.xml.gz
 ```
+### Set environment
+The docker compose file has the environment variables set for the redis connection and the location of the data files.
+This code uses redisjson and redisearch.  The redis database must have both of these modules installed.
+As of this writing, this redismod docker image does not work on the m1 arm64 based mac.  
+Because of this, the redis docker container is commented out.
+
 ### load categories
 The redis node and port can be changed. The python code uses 2 environment variable REDIS_SERVER and REDIS_PORT.  The default is REDIS_SERVER=redis and REDIS_PORT=6379
 ```bash
 docker exec -it flask bash -c "python categoryImport.py"
 ```
 ### load Products
-This can take quite a long time (maybe 35 minutes)
-The redis node and port can be changed. The python code uses 2 environment variable REDIS_SERVER and REDIS_PORT.  The default is REDIS_SERVER=redis and REDIS_PORT=6379
+This can take quite a long time (maybe 35 minutes).  It is possible to speed the product load by splitting the file.
+The python code to load the products uses python multi-processing based on the number of files found in the data/index directory.
+To facilitate this splitting of the file while keeping the header row on each of the split files,
+a script is provided to split the file until 100,000 row chunks.  This will create the separate files in the index directory
+and move the original files.index.csv file up to the data directory.
+These are the steps to do this:
+```bash
+cd scripts
+./splitFile.sh
+```
+The redis node and port can be changed. The python code uses 2 environment variable REDIS_SERVER and REDIS_PORT.  
+The default is REDIS_SERVER=redis and REDIS_PORT=6379.  See the docker-compose.yml file.
 ```bash
 docker exec -it flask bash -c "python productImport.py"
 ```
@@ -54,7 +76,32 @@ So, the tests not to be run should be commented out.
  ```bash
 ./scripts/sampleput.sh
 ```
-##  installing on mac
+  * run sample search queries   
+run sample redisearch queries as provided.  Run one at a time using scripts/searchQueries.txt
+
+##  Notes for running outside of Docker
+Follow most of the same steps as above with some changes
+
+### Instead of docker to execute, use python virtualenv
+  * create a virtualenv
+```bash
+cd src
+python3 -m venv venv
+source venv/bin/activate
+```
+   * Use an environment file for locations
+```bash
+source scripts/app.env
+```
+    * execute pythong scripts from the src directory
+```bash
+cd src
+pip install -r requirements.txt
+python categoryImport.py
+python productImport.py
+python app.py
+```
+###  installing on mac
 1. install xcode
 2. install homebrew
 ```bash

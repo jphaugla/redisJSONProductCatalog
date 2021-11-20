@@ -19,7 +19,7 @@ services:
     environment:
       - REDIS_SERVER=10.0.1.35
       - REDIS_PORT=13000
-      - INDEX_FILE_LOCATION=/data/files.index.csv
+      - INDEX_FILE_LOCATION=/data/index
       - CATEGORY_FILE_LOCATION=/data/CategoriesList.xml
     build:
       context: .

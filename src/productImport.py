@@ -31,12 +31,12 @@ def main():
         print("no passed in index file location ")
 
     print("process_files_parallel()" + str(startTime))
-    for (dirpath, dirnames, filenames) in os.walk(index_file_location):
-        print("dirpath=" + dirpath)
-        print(dirnames)
-        print(filenames)
-        process_files_parallel("start", dirpath, filenames)
-
+    # for (dirpath, dirnames, filenames) in os.walk(index_file_location):
+    #     print("dirpath=" + dirpath)
+    #     print(dirnames)
+    #     print(filenames)
+    #     process_files_parallel("start", dirpath, filenames)
+    process_file("../data/files100.csv")
 
 def process_file(file_name):
 
@@ -64,16 +64,19 @@ def process_file(file_name):
             #  increment prod_idx and use as incremental part of the key
             prod_idx += 1
             nextProduct = Product(**row)
-            category_id = 'Category:' + nextProduct.catid
-            categ_name = conn.json().get(category_id, "Name")
-            # parent_categ_name = conn.json().get(category_id,"ParentCategoryName")
-            getAll = conn.json().get(category_id)
-            # print(getAll)
-            thisCategory = Category(**getAll)
-            categ_name = thisCategory.Name
-            parent_category_name = thisCategory.ParentCategoryName
-            nextProduct.set_category_name(categ_name)
-            nextProduct.set_parent_category_name(parent_category_name)
+            if nextProduct.catid:
+                category_id = 'Category:' + nextProduct.catid
+                # print(row)
+                # print(category_id)
+                # categ_name = conn.json().get(category_id, "Name")
+                # parent_categ_name = conn.json().get(category_id,"ParentCategoryName")
+                getAll = conn.json().get(category_id)
+                print(getAll)
+                thisCategory = Category(**getAll)
+                categ_name = thisCategory.Name
+                parent_category_name = thisCategory.ParentCategoryName
+                nextProduct.set_category_name(categ_name)
+                nextProduct.set_parent_category_name(parent_category_name)
             nextProduct.set_key()
             # print("before write of product " + str(nextProduct.product_id) + " " + nextProduct.key_name)
             conn.json().set(nextProduct.key_name, Path.rootPath(), nextProduct.__dict__)
