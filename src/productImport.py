@@ -71,7 +71,7 @@ def process_file(file_name):
                 # categ_name = conn.json().get(category_id, "Name")
                 # parent_categ_name = conn.json().get(category_id,"ParentCategoryName")
                 getAll = conn.json().get(category_id)
-                print(getAll)
+                # print(getAll)
                 thisCategory = Category(**getAll)
                 categ_name = thisCategory.Name
                 parent_category_name = thisCategory.ParentCategoryName
