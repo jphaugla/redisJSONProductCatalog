@@ -72,11 +72,12 @@ def process_file(file_name):
                 # parent_categ_name = conn.json().get(category_id,"ParentCategoryName")
                 getAll = conn.json().get(category_id)
                 # print(getAll)
-                thisCategory = Category(**getAll)
-                categ_name = thisCategory.Name
-                parent_category_name = thisCategory.ParentCategoryName
-                nextProduct.set_category_name(categ_name)
-                nextProduct.set_parent_category_name(parent_category_name)
+                if(getAll):
+                    thisCategory = Category(**getAll)
+                    categ_name = thisCategory.Name
+                    parent_category_name = thisCategory.ParentCategoryName
+                    nextProduct.set_category_name(categ_name)
+                    nextProduct.set_parent_category_name(parent_category_name)
             nextProduct.set_key()
             # print("before write of product " + str(nextProduct.product_id) + " " + nextProduct.key_name)
             conn.json().set(nextProduct.key_name, Path.rootPath(), nextProduct.__dict__)
