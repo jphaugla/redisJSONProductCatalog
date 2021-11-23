@@ -76,7 +76,7 @@ docker exec -it flask bash -c "python appy.py"
 Easiest is to run the API tests using Postman.  Running Postman, use File->Import to import
 the following file for use with Postman-https://github.com/jphaugla/redisJSONProductCatalog/blob/main/scripts/Product-Category%20APIs.postman_collection.json
 Once the collection is imported, run each request to test the APIs.
-[Postman screen shot](images/postman-collection.png)
+![Postman screen shot](images/postman-collection.png)
 Alternatively, use the commands in this file https://github.com/jphaugla/redisJSONProductCatalog/blob/main/scripts/sampleput.sh
 Make sure to use *bash* as *zsh* has issues with the curl command 
 Note:  there are multiple API tests in the file but only one should be run at a time
