@@ -92,8 +92,8 @@ def process_file(file_name):
             #     model_key: str = "ProductModel:" + nextProduct.model_name
             #     # print("model key is " + model_key)
             #     conn.sadd(model_key, nextProduct.key_name)
-            if prod_idx % 10000 == 0:
-                print(str(prod_idx) + " rows loaded from file ")
+            if prod_idx % 50000 == 0:
+                print(str(prod_idx) + " rows loaded from file " + file_name)
         csv_file.close()
         print(str(prod_idx) + " rows loaded")
         conn.set("prod_highest_idx", prod_idx)
@@ -103,7 +103,7 @@ def process_file(file_name):
 def process_files_parallel(arg, dirname, names):
     # Process each file in parallel via Poll.map()
     print("starting process_files_parallel")
-    pool = Pool()
+    pool = Pool(processes=8)
     results = pool.map(process_file, [os.path.join(dirname, name) for name in names])
 
 
