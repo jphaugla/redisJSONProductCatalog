@@ -57,7 +57,7 @@ The python code to load the products uses python multi-processing based on the n
 To facilitate this splitting of the file while keeping the header row on each of the split files,
 a script is provided to split the file until 100,000 row chunks.  This will create the separate files in the index directory
 and move the original files.index.csv file up to the data directory.
-These are the steps to do this:
+These is a script steps to do this:
 ```bash
 cd scripts
 ./splitFile.sh
@@ -73,12 +73,13 @@ docker exec -it flask bash -c "python productImport.py"
 #  docker exec -it flask bash -c "python appy.py"
  ```
   * run API tests
+Easiest is to run the API tests using Postman.  Import
+the following file for use with Postman.  https://github.com/jphaugla/redisJSONProductCatalog/blob/main/scripts/Product-Category%20APIs.postman_collection.json
+Alternatively, use the commands in this file https://github.com/jphaugla/redisJSONProductCatalog/blob/main/scripts/sampleput.sh
 Make sure to use *bash* as *zsh* has issues with the curl command 
 Note:  there are multiple API tests in the file but only one should be run at a time
-So, the tests not to be run should be commented out.
- ```bash
-./scripts/sampleput.sh
-```
+So, the tests not to be run should be commented out.  
+
   * run sample search queries   
 run sample redisearch queries as provided.  Run one at a time using
 
