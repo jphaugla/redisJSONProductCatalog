@@ -34,34 +34,34 @@ print("beginning of appy.py now")
 
 categoryDefinition = IndexDefinition(prefix=['Category:'], index_type=IndexType.JSON)
 categorySCHEMA = (
-    TextField("$.LowPic", as_name='LowPic'),
-    TextField("$.ThumbPic", as_name='ThumbPic'),
+    # TextField("$.LowPic", as_name='LowPic', no_stem=True, no_index=True),
+    # TextField("$.ThumbPic", as_name='ThumbPic', no_stem=True, no_index=True),
     TextField("$.Name", as_name='Name'),
     TextField("$.ParentCategoryName", as_name='ParentCategoryName')
 )
 
 productDefinition = IndexDefinition(prefix=['mprodid:', 'prodid:'], index_type=IndexType.JSON)
 productSCHEMA = (
-    TextField("$.product_id", as_name='product_id'),
-    TextField("$.path", as_name='path'),
-    TextField("$.updated", as_name='updated'),
-    TextField("$.quality", as_name='quality'),
-    TextField("$.supplier_id", as_name='supplier_id'),
-    TextField("$.prod_id", as_name='prod_id'),
-    TextField("$.catid", as_name='catid'),
-    TextField("$.m_prod_id", as_name='m_prod_id'),
-    TextField("$.ean_upc", as_name='ean_upc'),
+    TextField("$.product_id", as_name='product_id', no_stem=True),
+    TextField("$.path", as_name='path', no_stem=True),
+    TextField("$.updated", as_name='updated', no_stem=True),
+    TextField("$.quality", as_name='quality', no_stem=True),
+    TextField("$.supplier_id", as_name='supplier_id', no_stem=True),
+    TextField("$.prod_id", as_name='prod_id', no_stem=True),
+    TextField("$.catid", as_name='catid', no_stem=True),
+    TextField("$.m_prod_id", as_name='m_prod_id', no_stem=True),
+    TextField("$.ean_upc", as_name='ean_upc', no_stem=True),
     TagField("$.country_market", separator=";", as_name='country_market'),
-    TextField("$.model_name", as_name='model_name'),
-    TextField("$.product_view", as_name='product_view'),
-    TextField("$.m_supplier_id", as_name='m_supplier_id'),
+    TextField("$.model_name", as_name='model_name', no_stem=True),
+    TextField("$.product_view", as_name='product_view', no_stem=True),
+    TextField("$.m_supplier_id", as_name='m_supplier_id', no_stem=True),
     TextField("$.m_supplier_name", as_name='m_supplier_name'),
-    TextField("$.high_pic", as_name='high_pic'),
+    # TextField("$.high_pic", as_name='high_pic', no_stem=True, no_index=True),
     # NumericField("$.high_pic_width", as_name='high_pic_width'),
     # NumericField("$.high_pic_height", as_name='high_pic_height'),
     # NumericField("$.high_pic_size", as_name='high_pic_size'),
     TagField("$.ean_upc_is_approved", separator=";", as_name='ean_upc_is_approved'),
-    TextField("$.Date_Added", as_name='date_added'),
+    TextField("$.Date_Added", as_name='date_added', no_stem=True),
     TextField("$.category_name", as_name='category_name'),
     TextField("$.parent_category_name", as_name='parent_category_name')
 )
