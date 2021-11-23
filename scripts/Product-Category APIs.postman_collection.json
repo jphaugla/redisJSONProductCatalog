@@ -1,0 +1,101 @@
+{
+	"info": {
+		"_postman_id": "e90ab9c9-7d4b-4894-9ac8-7584e84b0ede",
+		"name": "Product/Category APIs",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get Product from attribute",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/search?search_column=m_supplier_name&search_string=Lexmark",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"search"
+					],
+					"query": [
+						{
+							"key": "search_column",
+							"value": "m_supplier_name"
+						},
+						{
+							"key": "search_string",
+							"value": "Lexmark"
+						}
+					]
+				},
+				"description": "Get Product from one attribute.  Choose attribute key and value."
+			},
+			"response": []
+		},
+		{
+			"name": "Get Category Detail",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/category?show_category=Ink%20Cartridges",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"category"
+					],
+					"query": [
+						{
+							"key": "show_category",
+							"value": "Ink%20Cartridges"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Parent Category children",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": null
+			},
+			"response": []
+		},
+		{
+			"name": "Put new product",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": null
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Added Product",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/mprodid:jason:prodid:1397513:supplyid:148",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"mprodid:jason:prodid:1397513:supplyid:148"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
