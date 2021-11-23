@@ -1,7 +1,6 @@
 #!/bin/python
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request, render_template, Response, json
 from flask_bootstrap import Bootstrap
-from flask import request
 import redis
 from redis.commands.json.path import Path
 from redis import ResponseError
@@ -37,7 +36,8 @@ categoryDefinition = IndexDefinition(prefix=['Category:'], index_type=IndexType.
 categorySCHEMA = (
     TextField("$.LowPic", as_name='LowPic'),
     TextField("$.ThumbPic", as_name='ThumbPic'),
-    TextField("$.Name", as_name='Name')
+    TextField("$.Name", as_name='Name'),
+    TextField("$.ParentCategoryName", as_name='ParentCategoryName')
 )
 
 productDefinition = IndexDefinition(prefix=['mprodid:', 'prodid:'], index_type=IndexType.JSON)
@@ -123,17 +123,13 @@ def home(path):
             print("productSearch is " + productSearch)
             productReturn = db.ft(index_name="Product").search(productSearch)
             print("number returned is " + str(productReturn.total))
-            print(productReturn)
-            print(productReturn.docs)
-            print(productReturn.docs[0])
-            print(productReturn.docs[0].json)
             productResults =[]
             for i in range(min(productReturn.total-1, 9)):
-                print(str(i))
-                print(productReturn.docs[i])
-                print(productReturn.docs[i].json)
-                productResults.append(productReturn.docs[i].json)
-            return_string = jsonify(productResults,200)
+                results = productReturn.docs[i].json
+                final_results = json.loads(results)
+                # productResults.append(productReturn.docs[i].json)
+                productResults.append(final_results)
+            return_string = jsonify(productResults, 200)
         # category passed in will be Category name, return Category attributes
         elif path == 'category':
             get_category = request.args.get("show_category")
@@ -143,11 +139,22 @@ def home(path):
             catSearch = "@Name:" + get_category
             catReturn = db.ft(index_name="Category").search(catSearch)
             print("number returned is " + str(catReturn.total))
-            print(catReturn)
-            print(catReturn.docs)
-            print(catReturn.docs[0])
-            print(catReturn.docs[0].json)
             return_string = catReturn.docs[0].json
+        elif path == 'parent_category':
+            get_parent = request.args.get("parent_category")
+            print("reporting category is ", get_parent)
+            #  retrieve the category index using the passed in category name
+            #  pull this from the zCategoryName sorted set holding category name and category id separated by colon
+            catSearch = "@ParentCategoryName:" + get_parent
+            catReturn = db.ft(index_name="Category").search(catSearch)
+            print("number returned is " + str(catReturn.total))
+            catResults = []
+            for i in range(min(catReturn.total - 1, 9)):
+                results = catReturn.docs[i].json
+                final_results = json.loads(results)
+                # catResults.append(productReturn.docs[i].json)
+                catResults.append(final_results)
+            return_string = jsonify(catResults, 200)
 
         elif not db.exists(path):
             return_string = "Error: thing doesn't exist"
