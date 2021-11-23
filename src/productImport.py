@@ -31,15 +31,15 @@ def main():
         print("no passed in index file location ")
 
     print("process_files_parallel()" + str(startTime))
-    # for (dirpath, dirnames, filenames) in os.walk(index_file_location):
-    #     print("dirpath=" + dirpath)
-    #     print(dirnames)
-    #     print(filenames)
-    #     process_files_parallel("start", dirpath, filenames)
-    process_file("../data/files100.csv")
+    for (dirpath, dirnames, filenames) in os.walk(index_file_location):
+        # print("dirpath=" + dirpath)
+        # print(dirnames)
+        # print(filenames)
+        process_files_parallel("start", dirpath, filenames)
+    # process_file("../data/files100.csv")
+
 
 def process_file(file_name):
-
     print("starting process_file with file name " + file_name)
     if environ.get('REDIS_SERVER') is not None:
         redis_server = environ.get('REDIS_SERVER')
@@ -54,7 +54,7 @@ def process_file(file_name):
     else:
         redis_port = 13000
         print("no passed in redis port variable ")
-    conn = redis.StrictRedis(host = redis_server, port=redis_port, db=0, charset="utf-8", decode_responses=True)
+    conn = redis.StrictRedis(host=redis_server, port=redis_port, db=0, charset="utf-8", decode_responses=True)
     with open(file_name) as csv_file:
         # file is tab delimited
         csv_reader = csv.DictReader(csv_file, delimiter='\t', quoting=csv.QUOTE_NONE)
@@ -106,9 +106,11 @@ def process_files_parallel(arg, dirname, names):
     pool = Pool()
     results = pool.map(process_file, [os.path.join(dirname, name) for name in names])
 
+
 def process_files(arg, dirname, names):
     ''' Process each file in via map() '''
     results = map(process_file, [os.path.join(dirname, name) for name in names])
+
 
 if '__main__' == __name__:
     main()
