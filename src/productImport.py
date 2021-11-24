@@ -30,8 +30,8 @@ def main():
         index_file_location = "../data/index/"
         print("no passed in index file location ")
     if environ.get('PROCESSES') is not None:
-        numberProcesses = (environ.get('PROCESSES'))
-        print("passed in PROCESSES " + numberProcesses)
+        numberProcesses = int(environ.get('PROCESSES'))
+        print("passed in PROCESSES " + str(numberProcesses))
     else:
         numberProcesses = 1
         print("no passed in number of processes ")
@@ -125,7 +125,7 @@ def process_file(file_name):
     print("Finished productimport.py at " + str(datetime.datetime.now()))
 
 
-def process_files_parallel(dirname, names, numProcesses):
+def process_files_parallel(dirname, names, numProcesses: int):
     # Process each file in parallel via Poll.map()
     print("starting process_files_parallel")
     pool = Pool(processes=numProcesses)
