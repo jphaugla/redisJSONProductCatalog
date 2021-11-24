@@ -68,19 +68,22 @@ productSCHEMA = (
 
 print("before try on product")
 try:
-    db.ft(index_name="Product").info()
-    print("checking for Product index")
-except ResponseError:
     print("creating Product index")
     db.ft(index_name="Product").create_index(productSCHEMA, definition=productDefinition)
+except ResponseError:
+    db.ft(index_name="Product").info()
+
+
+
 
 print("before try on category")
 try:
-    db.ft(index_name="Category").info()
-    print("checking for Category index")
-except ResponseError:
     print("creating Category index")
     db.ft(index_name="Category").create_index(categorySCHEMA, definition=categoryDefinition)
+
+except ResponseError:
+    db.ft(index_name="Category").info()
+
 
 def isInt(s):
     try:
