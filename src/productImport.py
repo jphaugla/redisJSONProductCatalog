@@ -29,15 +29,22 @@ def main():
     else:
         index_file_location = "../data/index/"
         print("no passed in index file location ")
+    if environ.get('PROCESSES') is not None:
+        numberProcesses = (environ.get('PROCESSES'))
+        print("passed in PROCESSES " + numberProcesses)
+    else:
+        numberProcesses = 1
+        print("no passed in number of processes ")
 
     print("process_files_parallel()" + str(startTime))
     for (dirpath, dirnames, filenames) in os.walk(index_file_location):
         # print("dirpath=" + dirpath)
         # print(dirnames)
         # print(filenames)
-        process_files_parallel(dirpath, filenames)
+        process_files_parallel(dirpath, filenames, numberProcesses)
     # process_file("../data/files100.csv")
-
+    endTime = time.time()
+    print ("processing complete start was " + startTime + " end was " + endTime + " total time " +  str(endTime - startTime))
 
 def process_file(file_name):
     print("starting process_file with file name " + file_name)
@@ -118,10 +125,10 @@ def process_file(file_name):
     print("Finished productimport.py at " + str(datetime.datetime.now()))
 
 
-def process_files_parallel(dirname, names):
+def process_files_parallel(dirname, names, numProcesses):
     # Process each file in parallel via Poll.map()
     print("starting process_files_parallel")
-    pool = Pool(processes=12)
+    pool = Pool(numProcesses=numProcesses)
     results = pool.map(process_file, [os.path.join(dirname, name) for name in names])
 
 
