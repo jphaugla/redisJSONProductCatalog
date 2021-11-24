@@ -71,8 +71,8 @@ def process_file(file_name):
             nextProduct = Product(**row)
             if nextProduct.catid:
                 category_id = 'Category:' + nextProduct.catid
-                print(row)
-                print(category_id)
+                # print(row)
+                # print(category_id)
                 # categ_name = conn.json().get(category_id, "Name")
                 # parent_categ_name = conn.json().get(category_id,"ParentCategoryName")
                 # the input file is loosely in category id order so no need to re-lookup same category over and over
@@ -81,7 +81,7 @@ def process_file(file_name):
                     parent_category_name = previousParentCatName
                     nextProduct.set_category_name(categ_name)
                     nextProduct.set_parent_category_name(parent_category_name)
-                    print("previous matched prev was " + previousCatName + " prev parent " + previousParentCatName)
+                    # print("previous matched prev was " + previousCatName + " prev parent " + previousParentCatName)
                 else:
                     getAll = conn.json().get(category_id)
                     if(getAll):
@@ -94,7 +94,7 @@ def process_file(file_name):
                         previousCatID = nextProduct.catid
                         previousCatName = categ_name
                         previousParentCatName = parent_category_name
-                        print("writing categ_name " + categ_name + " parent category " + parent_category_name)
+                        # print("writing categ_name " + categ_name + " parent category " + parent_category_name)
             nextProduct.set_key()
             # print("before write of product " + str(nextProduct.product_id) + " " + nextProduct.key_name)
             conn.json().set(nextProduct.key_name, Path.rootPath(), nextProduct.__dict__)
