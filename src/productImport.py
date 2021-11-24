@@ -31,12 +31,12 @@ def main():
         print("no passed in index file location ")
 
     print("process_files_parallel()" + str(startTime))
-    for (dirpath, dirnames, filenames) in os.walk(index_file_location):
+    # for (dirpath, dirnames, filenames) in os.walk(index_file_location):
         # print("dirpath=" + dirpath)
         # print(dirnames)
         # print(filenames)
-        process_files_parallel("start", dirpath, filenames)
-    # process_file("../data/files100.csv")
+        #process_files_parallel("start", dirpath, filenames)
+    process_file("../data/files100.csv")
 
 
 def process_file(file_name):
@@ -60,24 +60,41 @@ def process_file(file_name):
         csv_reader = csv.DictReader(csv_file, delimiter='\t', quoting=csv.QUOTE_NONE)
         prod_idx = 0
         #  go through all rows in the file
+        previousCatID = "juststarting"
+        previousCatName = "juststarting"
+        previousParentCatName = "juststarting"
+        categ_name = ""
+        parent_category_name = ""
         for row in csv_reader:
             #  increment prod_idx and use as incremental part of the key
             prod_idx += 1
             nextProduct = Product(**row)
             if nextProduct.catid:
                 category_id = 'Category:' + nextProduct.catid
-                # print(row)
-                # print(category_id)
+                print(row)
+                print(category_id)
                 # categ_name = conn.json().get(category_id, "Name")
                 # parent_categ_name = conn.json().get(category_id,"ParentCategoryName")
-                getAll = conn.json().get(category_id)
-                # print(getAll)
-                if(getAll):
-                    thisCategory = Category(**getAll)
-                    categ_name = thisCategory.Name
-                    parent_category_name = thisCategory.ParentCategoryName
+                # the input file is loosely in category id order so no need to re-lookup same category over and over
+                if previousCatID == nextProduct.catid:
+                    categ_name = previousCatName
+                    parent_category_name = previousParentCatName
                     nextProduct.set_category_name(categ_name)
                     nextProduct.set_parent_category_name(parent_category_name)
+                    print("previous matched prev was " + previousCatName + " prev parent " + previousParentCatName)
+                else:
+                    getAll = conn.json().get(category_id)
+                    if(getAll):
+                        print(getAll)
+                        thisCategory = Category(**getAll)
+                        categ_name = thisCategory.Name
+                        parent_category_name = thisCategory.ParentCategoryName
+                        nextProduct.set_category_name(categ_name)
+                        nextProduct.set_parent_category_name(parent_category_name)
+                        previousCatID = nextProduct.catid
+                        previousCatName = categ_name
+                        previousParentCatName = parent_category_name
+                        print("writing categ_name " + categ_name + " parent category " + parent_category_name)
             nextProduct.set_key()
             # print("before write of product " + str(nextProduct.product_id) + " " + nextProduct.key_name)
             conn.json().set(nextProduct.key_name, Path.rootPath(), nextProduct.__dict__)
