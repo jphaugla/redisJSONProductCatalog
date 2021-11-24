@@ -31,12 +31,12 @@ def main():
         print("no passed in index file location ")
 
     print("process_files_parallel()" + str(startTime))
-    # for (dirpath, dirnames, filenames) in os.walk(index_file_location):
+    for (dirpath, dirnames, filenames) in os.walk(index_file_location):
         # print("dirpath=" + dirpath)
         # print(dirnames)
         # print(filenames)
-        #process_files_parallel("start", dirpath, filenames)
-    process_file("../data/files100.csv")
+        process_files_parallel(dirpath, filenames)
+    # process_file("../data/files100.csv")
 
 
 def process_file(file_name):
@@ -118,14 +118,14 @@ def process_file(file_name):
     print("Finished productimport.py at " + str(datetime.datetime.now()))
 
 
-def process_files_parallel(arg, dirname, names):
+def process_files_parallel(dirname, names):
     # Process each file in parallel via Poll.map()
     print("starting process_files_parallel")
-    pool = Pool(processes=8)
+    pool = Pool(processes=12)
     results = pool.map(process_file, [os.path.join(dirname, name) for name in names])
 
 
-def process_files(arg, dirname, names):
+def process_files(dirname, names):
     ''' Process each file in via map() '''
     results = map(process_file, [os.path.join(dirname, name) for name in names])
 
