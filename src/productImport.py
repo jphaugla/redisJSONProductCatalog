@@ -128,7 +128,7 @@ def process_file(file_name):
 def process_files_parallel(dirname, names, numProcesses):
     # Process each file in parallel via Poll.map()
     print("starting process_files_parallel")
-    pool = Pool(numProcesses=numProcesses)
+    pool = Pool(processes=numProcesses)
     results = pool.map(process_file, [os.path.join(dirname, name) for name in names])
 
 
