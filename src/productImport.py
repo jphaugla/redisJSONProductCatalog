@@ -23,6 +23,7 @@ def main():
     # redis_pool = redis.ConnectionPool(host='localhost', port=6379, db=0)
     print("Starting productimport.py at " + str(datetime.datetime.now()))
     startTime = time.time()
+    startTimeChar = str(datetime.datetime.now())
     if environ.get('INDEX_FILE_LOCATION') is not None:
         index_file_location = (environ.get('INDEX_FILE_LOCATION'))
         print("passed in index file location " + index_file_location)
@@ -44,7 +45,8 @@ def main():
         process_files_parallel(dirpath, filenames, numberProcesses)
     # process_file("../data/files100.csv")
     endTime = time.time()
-    print ("processing complete start was " + str(startTime) + " end was " + str(endTime) + " total time " + str(endTime - startTime))
+    print ("processing complete. start was " + startTimeChar + " end was " + str(datetime.datetime.now()) +
+           " total time " + str(int(endTime - startTime))) + " seconds"
 
 def process_file(file_name):
     print("starting process_file with file name " + file_name)

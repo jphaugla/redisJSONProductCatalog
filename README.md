@@ -100,6 +100,7 @@ python3 -m venv venv
 source venv/bin/activate
 ```
    * Use an environment file for locations
+   * Can also set the number of concurrent processes for the client using the "PROCESSES" environment variable
 
 ```bash
 source scripts/app.env
