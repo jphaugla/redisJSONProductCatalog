@@ -158,7 +158,10 @@ def home(path):
                 # catResults.append(productReturn.docs[i].json)
                 catResults.append(final_results)
             return_string = jsonify(catResults, 200)
-
+        elif path == 'prod':
+            get_prod = request.args.get("prodkey")
+            return_value = db.json().get(get_prod)
+            return_string = jsonify(return_value,200)
         elif not db.exists(path):
             return_string = "Error: thing doesn't exist"
 
