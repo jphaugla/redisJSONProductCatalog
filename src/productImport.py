@@ -45,8 +45,8 @@ def main():
         process_files_parallel(dirpath, filenames, numberProcesses)
     # process_file("../data/files100.csv")
     endTime = time.time()
-    print ("processing complete. start was " + startTimeChar + " end was " + str(datetime.datetime.now()) +
-           " total time " + str(int(endTime - startTime))) + " seconds"
+    print("processing complete. start was " + startTimeChar + " end was " + str(datetime.datetime.now()) +
+           " total time " + str(int(endTime - startTime)) + " seconds")
 
 def process_file(file_name):
     print("starting process_file with file name " + file_name)
