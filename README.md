@@ -44,7 +44,8 @@ gunzip files.index.csv.gz
 The docker compose file has the environment variables set for the redis connection and the location of the data files.
 This code uses redisjson and redisearch.  The redis database must have both of these modules installed.
 As of this writing, this redismod docker image does not work on the m1 arm64 based mac.  
-Because of this, the redis docker container is commented out.
+Default docker-compose is set to redismod
+
 
 ### load categories
 The redis node and port can be changed. The python code uses 2 environment variable REDIS_SERVER and REDIS_PORT.  The default is REDIS_SERVER=redis and REDIS_PORT=6379

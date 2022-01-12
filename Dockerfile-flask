@@ -7,7 +7,7 @@ FROM python:3
 ENV APP /app
 # Create the directory and instruct Docker to operate
 # from there from now on
-RUN mkdir $APP
+# RUN mkdir $APP
 WORKDIR $APP
 # Expose the port uWSGI will listen on
 EXPOSE 5000
@@ -17,7 +17,7 @@ COPY requirements.txt .
 # Install Python dependencies
 RUN pip install -r requirements.txt
 # We copy the rest of the codebase into the image
-COPY . .
+# COPY . .
 # Finally, we run uWSGI with the ini file we
 # created earlier
 CMD python appy.py
