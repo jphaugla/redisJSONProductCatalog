@@ -162,8 +162,11 @@ def home(path):
             get_prod = request.args.get("prodkey")
             return_value = db.json().get(get_prod)
             return_string = jsonify(return_value,200)
-        elif not db.exists(path):
-            return_string = "Error: thing doesn't exist"
+        else:
+             print("in the GET before call to index.html")
+             response=app.send_static_file('index.html')
+             response.headers['Content-Type']='text/html'
+             return_string = response
 
     return return_string
 
