@@ -3,3 +3,4 @@ Flask
 Flask_Bootstrap
 redis>=4.0
 uwsgi
+requests

@@ -2,8 +2,8 @@ version: '3'
 
 services:
   redis:
-    image: redislabs/redismod:latest
-    # image: myredis
+    # image: redislabs/redismod:latest
+    image: myredis
     container_name: redis
     environment:
       # ALLOW_EMPTY_PASSWORD is recommended only for development.
@@ -21,7 +21,12 @@ services:
       - REDIS_PORT=6379
       - INDEX_FILE_LOCATION=/data/index
       - CATEGORY_FILE_LOCATION=/data/CategoriesList.xml
-      - PROCESSES=4
+      - PRODUCT_FILE_LOCATION=/data/product
+      - PRODID_FILE_LOCATION=/data/prodid
+      - PROCESSES=8
+      - PYTHONBUFFERED=0
+      - ICECAT_USER=xxxxxx
+      - ICECAT_PW=xxxxxx
     build:
       context: .
       dockerfile: Dockerfile-flask
@@ -30,3 +35,5 @@ services:
     volumes:
       - "./src/:/app"
       - "./data/:/data"
+    depends_on:
+      - redis

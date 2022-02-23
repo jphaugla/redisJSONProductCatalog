@@ -43,8 +43,9 @@ categorySCHEMA = (
 productDefinition = IndexDefinition(prefix=['mprodid:', 'prodid:'], index_type=IndexType.JSON)
 productSCHEMA = (
     TextField("$.product_id", as_name='product_id', no_stem=True),
-    TextField("$.path", as_name='path', no_stem=True),
-    TextField("$.updated", as_name='updated', no_stem=True),
+    # path and updated not needed
+    # TextField("$.path", as_name='path', no_stem=True),
+    # TextField("$.updated", as_name='updated', no_stem=True),
     TextField("$.quality", as_name='quality', no_stem=True),
     TextField("$.supplier_id", as_name='supplier_id', no_stem=True),
     TextField("$.prod_id", as_name='prod_id', no_stem=True),
@@ -61,7 +62,7 @@ productSCHEMA = (
     # NumericField("$.high_pic_height", as_name='high_pic_height'),
     # NumericField("$.high_pic_size", as_name='high_pic_size'),
     TagField("$.ean_upc_is_approved", separator=";", as_name='ean_upc_is_approved'),
-    TextField("$.Date_Added", as_name='date_added', no_stem=True),
+    # TextField("$.Date_Added", as_name='date_added', no_stem=True),
     TextField("$.category_name", as_name='category_name'),
     TextField("$.parent_category_name", as_name='parent_category_name')
 )

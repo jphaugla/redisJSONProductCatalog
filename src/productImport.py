@@ -2,6 +2,7 @@
 
 import csv
 import time
+# import shlex, subprocess
 
 import redis
 from redis.commands.json.path import Path
@@ -43,7 +44,7 @@ def main():
         # print(dirnames)
         # print(filenames)
         process_files_parallel(dirpath, filenames, numberProcesses)
-    # process_file("../data/files100.csv")
+    # process_file("../data/files19.csv")
     endTime = time.time()
     print("processing complete. start was " + startTimeChar + " end was " + str(datetime.datetime.now()) +
            " total time " + str(int(endTime - startTime)) + " seconds")
@@ -54,31 +55,52 @@ def process_file(file_name):
         redis_server = environ.get('REDIS_SERVER')
         print("passed in redis server is " + redis_server)
     else:
-        redis_server = '10.0.1.35'
+        redis_server = 'localhost'
         print("no passed in redis server variable ")
 
     if environ.get('REDIS_PORT') is not None:
         redis_port = int(environ.get('REDIS_PORT'))
         print("passed in redis port is " + str(redis_port))
     else:
-        redis_port = 13000
+        redis_port = 6379
         print("no passed in redis port variable ")
+    iceCatUser = ""
+    iceCatPw = ""
+    if environ.get('ICECAT_USER') is not None:
+        iceCatUser = environ.get('ICECAT_USER')
+        print("passed in iceCatUser " + iceCatUser)
+    else:
+        print("no passed in icecat_user ")
+        exit(1)
+    if environ.get('ICECAT_PW') is not None:
+        iceCatPw = environ.get('ICECAT_PW')
+        print("passed in iceCatUPw " + iceCatPw)
+    else:
+        print("no passed in icecat_password ")
+        exit(1)
+
     conn = redis.StrictRedis(host=redis_server, port=redis_port, db=0, charset="utf-8", decode_responses=True)
     with open(file_name) as csv_file:
         # file is tab delimited
         csv_reader = csv.DictReader(csv_file, delimiter='\t', quoting=csv.QUOTE_NONE)
         prod_idx = 0
+        prod_loaded = 0
         #  go through all rows in the file
         previousCatID = "juststarting"
         previousCatName = "juststarting"
         previousParentCatName = "juststarting"
         categ_name = ""
         parent_category_name = ""
+
+        # this was not practical.  Way too slow
+        # CURL_PREFIX = "curl -u " + iceCatUser + ":" + iceCatPw + " https://data.Icecat.biz/"
+        # print(CURL_PREFIX)
+
         for row in csv_reader:
             #  increment prod_idx and use as incremental part of the key
             prod_idx += 1
             nextProduct = Product(**row)
-            if nextProduct.catid:
+            if nextProduct.catid and nextProduct.quality == "ICECAT":
                 category_id = 'Category:' + nextProduct.catid
                 # print(row)
                 # print(category_id)
@@ -104,9 +126,25 @@ def process_file(file_name):
                         previousCatName = categ_name
                         previousParentCatName = parent_category_name
                         # print("writing categ_name " + categ_name + " parent category " + parent_category_name)
-            nextProduct.set_key()
+            if nextProduct.quality == "ICECAT":
+                nextProduct.set_key()
+                prod_loaded += 1
+            # if nextProduct.product_id:
+            #     productDetailFile = nextProduct.path.replace("/INT/", "/EN/")
+            #     cmd = CURL_PREFIX + productDetailFile + " -o " + nextProduct.product_id + ".xml"
+            #     print(cmd)
+            #     args = shlex.split(cmd)
+            #     process = subprocess.Popen(args, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd="../data/product/")
+            #     stdout, stderr = process.communicate()
+            #     conn.sadd("prodToKey", nextProduct.product_id + ":" + nextProduct.key_name)
             # print("before write of product " + str(nextProduct.product_id) + " " + nextProduct.key_name)
-            conn.json().set(nextProduct.key_name, Path.rootPath(), nextProduct.__dict__)
+                if nextProduct.m_prod_id:
+                    title = conn.json().get(nextProduct.m_prod_id, "Title")
+                    if title:
+                        nextProduct.title = title
+                elif nextProduct.model_name:
+                    nextProduct.title = nextProduct.model_name
+                conn.json().set(nextProduct.key_name, Path.rootPath(), nextProduct.__dict__)
             # 0)path 1)product_id 2)updated 3)quality 4)supplier_id 5)prod_id 6)catid 7)m_prod_id 8)ean_upc 9)on_market
             # 10)country_market 11)model_name 12)product_view 13)high_pic 14)high_pic_size
             # 15)high_pic_width 16)high_pic_height 17)m_supplier_id 18)m_supplier_name 19)ean_upc_is_approved
@@ -120,9 +158,9 @@ def process_file(file_name):
             #     # print("model key is " + model_key)
             #     conn.sadd(model_key, nextProduct.key_name)
             if prod_idx % 50000 == 0:
-                print(str(prod_idx) + " rows loaded from file " + file_name)
+                print(str(prod_idx) + " rows loaded from file " + file_name + " " + str(prod_loaded) + " loaded to redis")
         csv_file.close()
-        print(str(prod_idx) + " rows loaded")
+        print(str(prod_idx) + " rows loaded " + str(prod_loaded) + " loaded to redis")
         conn.set("prod_highest_idx", prod_idx)
     print("Finished productimport.py at " + str(datetime.datetime.now()))
 

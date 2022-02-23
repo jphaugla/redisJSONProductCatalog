@@ -25,6 +25,7 @@ class Product(object):
         self.key_name = ""
         self.category_name = ""
         self.parent_category_name = ""
+        self.title = ""
         for key in kwargs:
             setattr(self, key, kwargs[key])
 

@@ -16,18 +16,18 @@ def main():
         redis_server = environ.get('REDIS_SERVER')
         print("passed in redis server is " + redis_server)
     else:
-        redis_server = '10.0.1.35'
+        redis_server = 'localhost'
         print("no passed in redis server variable ")
 
     if environ.get('REDIS_PORT') is not None:
         redis_port = int(environ.get('REDIS_PORT'))
         print("passed in redis port is " + str(redis_port))
     else:
-        redis_port = 13000
+        redis_port = 6379
         print("no passed in redis port variable ")
 
     if environ.get('CATEGORY_FILE_LOCATION') is not None:
-        category_file_location = (environ.get('CATEGORY_FILE_LOCATION'))
+        category_file_location = environ.get('CATEGORY_FILE_LOCATION')
         print("passed in category file location " + category_file_location)
     else:
         category_file_location = "../data/CategoriesList.xml"
