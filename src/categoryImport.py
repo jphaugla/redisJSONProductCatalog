@@ -26,8 +26,9 @@ def main():
         redis_port = 6379
         print("no passed in redis port variable ")
     if environ.get('REDIS_PASSWORD') is not None:
-        redis_password = int(environ.get('REDIS_PASSWORD'))
-        print("passed in redis password is " + str(redis_password))
+        redis_password = environ.get('REDIS_PASSWORD')
+        print("passed in redis password is " + redis_password)
+        
     if environ.get('CATEGORY_FILE_LOCATION') is not None:
         category_file_location = environ.get('CATEGORY_FILE_LOCATION')
         print("passed in category file location " + category_file_location)
