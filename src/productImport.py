@@ -64,6 +64,9 @@ def process_file(file_name):
     else:
         redis_port = 6379
         print("no passed in redis port variable ")
+    if environ.get('REDIS_PASSWORD') is not None:
+        redis_password = environ.get('REDIS_PASSWORD')
+        print("passed in redis password is " + redis_password)
     iceCatUser = ""
     iceCatPw = ""
     if environ.get('ICECAT_USER') is not None:
@@ -79,7 +82,11 @@ def process_file(file_name):
         print("no passed in icecat_password ")
         exit(1)
 
-    conn = redis.StrictRedis(host=redis_server, port=redis_port, db=0, charset="utf-8", decode_responses=True)
+    if redis_password is not None:
+        conn = redis.StrictRedis(redis_server, redis_port, password=redis_password, charset="utf-8",
+                                 decode_responses=True)
+    else:
+        conn = redis.StrictRedis(redis_server, redis_port, charset="utf-8", decode_responses=True)
     with open(file_name) as csv_file:
         # file is tab delimited
         csv_reader = csv.DictReader(csv_file, delimiter='\t', quoting=csv.QUOTE_NONE)
