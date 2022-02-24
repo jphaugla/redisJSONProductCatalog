@@ -114,7 +114,14 @@ def process_file(file_name):
                     nextProduct.set_parent_category_name(parent_category_name)
                     # print("previous matched prev was " + previousCatName + " prev parent " + previousParentCatName)
                 else:
-                    getAll = conn.json().get(category_id)
+                    print("in categ else")
+                    getAll = None;
+                    if environ.get('WRITE_JSON') is not None and environ.get('WRITE_JSON') == "true":
+                        getAll = conn.json().get(category_id)
+                        # print("got from json ")
+                    else:
+                        getAll = conn.hgetall(category_id)
+                        # print("got from hash ")
                     if(getAll):
                         # print(getAll)
                         thisCategory = Category(**getAll)
@@ -129,6 +136,7 @@ def process_file(file_name):
             if nextProduct.quality == "ICECAT":
                 nextProduct.set_key()
                 prod_loaded += 1
+                print("prodkey " + nextProduct.key_name)
             # if nextProduct.product_id:
             #     productDetailFile = nextProduct.path.replace("/INT/", "/EN/")
             #     cmd = CURL_PREFIX + productDetailFile + " -o " + nextProduct.product_id + ".xml"
@@ -139,12 +147,21 @@ def process_file(file_name):
             #     conn.sadd("prodToKey", nextProduct.product_id + ":" + nextProduct.key_name)
             # print("before write of product " + str(nextProduct.product_id) + " " + nextProduct.key_name)
                 if nextProduct.m_prod_id:
-                    title = conn.json().get(nextProduct.m_prod_id, "Title")
+                    if environ.get('WRITE_JSON') is not None and environ.get('WRITE_JSON') == "true":
+                        title = conn.json().get("PRODID:" + nextProduct.m_prod_id, "Title")
+                        print("json found " + nextProduct.m_prod_id)
+                    else:
+                        title = conn.hget("PRODID:" + nextProduct.m_prod_id, "Title")
+                        print("hash found " + nextProduct.m_prod_id)
                     if title:
+                        print("title found " + title)
                         nextProduct.title = title
                 elif nextProduct.model_name:
                     nextProduct.title = nextProduct.model_name
-                conn.json().set(nextProduct.key_name, Path.rootPath(), nextProduct.__dict__)
+                if environ.get('WRITE_JSON') is not None and environ.get('WRITE_JSON') == "true":
+                    conn.json().set(nextProduct.key_name, Path.rootPath(), nextProduct.__dict__)
+                else:
+                    conn.hset(nextProduct.key_name, mapping=nextProduct.__dict__)
             # 0)path 1)product_id 2)updated 3)quality 4)supplier_id 5)prod_id 6)catid 7)m_prod_id 8)ean_upc 9)on_market
             # 10)country_market 11)model_name 12)product_view 13)high_pic 14)high_pic_size
             # 15)high_pic_width 16)high_pic_height 17)m_supplier_id 18)m_supplier_name 19)ean_upc_is_approved

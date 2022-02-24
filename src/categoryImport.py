@@ -85,9 +85,10 @@ def main():
                             # print("name under parent child is " + str(name))
                             if name.tag == 'Name' and name.attrib['langid'] == '1':
                                 next_category.ParentCategoryName = str(name.attrib['Value'])
-                    # this is hash write
-                    # conn.hset(next_category.get_key(), mapping=next_category.__dict__)
-                    conn.json().set(next_category.get_key(), Path.rootPath(), next_category.__dict__)
+                    if environ.get('WRITE_JSON') is not None and environ.get('WRITE_JSON') == "true":
+                        conn.json().set(next_category.get_key(), Path.rootPath(), next_category.__dict__)
+                    else:
+                        conn.hset(next_category.get_key(), mapping=next_category.__dict__)
             if cat_cntr % 1000 == 0:
                 print(str(cat_cntr) + " categories loaded")
 

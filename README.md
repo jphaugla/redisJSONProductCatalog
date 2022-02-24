@@ -29,6 +29,10 @@ curl -u 'yourUN':'yourPW' https://data.Icecat.biz/export/freexml/refs/Categories
 mkdir index
 cd index
 curl -u 'yourUN':'yourPW' https://data.Icecat.biz/export/freexml/files.index.csv.gz -o files.index.csv.gz
+cd ..
+mkdir prodid
+cd prodid
+curl -u 'yourUN':'yourPW' https://data.Icecat.biz/prodid/prodid_d.txt.gz -o prodid_d.txt.gz
 ```
 
 ### unzip data files
@@ -39,6 +43,9 @@ cd data
 gunzip CategoriesList.xml.gz
 cd index
 gunzip files.index.csv.gz
+cd ..
+cd prodid
+gunzip prodid_d.txt.gz
 ```
 ### Set environment
 The docker compose file has the environment variables set for the redis connection and the location of the data files.
@@ -51,6 +58,22 @@ Default docker-compose is set to redismod
 The redis node and port can be changed. The python code uses 2 environment variable REDIS_SERVER and REDIS_PORT.  The default is REDIS_SERVER=redis and REDIS_PORT=6379
 ```bash
 docker exec -it flask bash -c "python categoryImport.py"
+```
+### load Product Title
+This can take quite a long time (maybe 35 minutes).  It is possible to speed the product load by splitting the file.
+The python code to load the products uses python multi-processing based on the number of files found in the data/index directory.
+To facilitate this splitting of the file while keeping the header row on each of the split files,
+a script is provided to split the file until 100,000 row chunks.  This will create the separate files in the index directory
+and move the original files.index.csv file up to the data directory.
+These is a script steps to do this:
+```bash
+cd scripts
+./splitProdid.sh
+```
+The redis node and port can be changed. The python code uses 2 environment variable REDIS_SERVER and REDIS_PORT.  
+The default is REDIS_SERVER=redis and REDIS_PORT=6379.  See the docker-compose.yml file.
+```bash
+docker exec -it flask bash -c "python productTitleImport.py"
 ```
 ### load Products
 This can take quite a long time (maybe 35 minutes).  It is possible to speed the product load by splitting the file.

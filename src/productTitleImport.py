@@ -83,7 +83,12 @@ def process_file(file_name):
                 prod_loaded += 1
                 subset = {k: nextProduct.__dict__[k] for k in ('Partnumber', 'Title')}
                 # print(subset)
-                conn.json().set(nextProduct.Partnumber, Path.rootPath(), subset)
+                if environ.get('WRITE_JSON') is not None and environ.get('WRITE_JSON') == "true":
+                    conn.json().set("PRODID:" + nextProduct.Partnumber, Path.rootPath(), subset)
+                else:
+                    conn.hset("PRODID:" + nextProduct.Partnumber, mapping=subset)
+                # this write is for debug to know what line failed on
+                conn.set("prod_highest_idx" + file_name, prod_idx)
             # 0)path 1)product_id 2)updated 3)quality 4)supplier_id 5)prod_id 6)catid 7)m_prod_id 8)ean_upc 9)on_market
             # 10)country_market 11)model_name 12)product_view 13)high_pic 14)high_pic_size
             # 15)high_pic_width 16)high_pic_height 17)m_supplier_id 18)m_supplier_name 19)ean_upc_is_approved

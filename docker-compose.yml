@@ -2,8 +2,8 @@ version: '3'
 
 services:
   redis:
-    # image: redislabs/redismod:latest
-    image: myredis
+    image: redislabs/redismod:latest
+    # image: myredis
     container_name: redis
     environment:
       # ALLOW_EMPTY_PASSWORD is recommended only for development.
@@ -27,6 +27,7 @@ services:
       - PYTHONBUFFERED=0
       - ICECAT_USER=xxxxxx
       - ICECAT_PW=xxxxxx
+      - WRITE_JSON=false
     build:
       context: .
       dockerfile: Dockerfile-flask
