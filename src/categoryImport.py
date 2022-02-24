@@ -25,7 +25,9 @@ def main():
     else:
         redis_port = 6379
         print("no passed in redis port variable ")
-
+    if environ.get('REDIS_PASSWORD') is not None:
+        redis_password = int(environ.get('REDIS_PASSWORD'))
+        print("passed in redis password is " + str(redis_password))
     if environ.get('CATEGORY_FILE_LOCATION') is not None:
         category_file_location = environ.get('CATEGORY_FILE_LOCATION')
         print("passed in category file location " + category_file_location)
@@ -33,7 +35,10 @@ def main():
         category_file_location = "../data/CategoriesList.xml"
         print("no passed in category file location ")
     # conn = redis.StrictRedis(redis_server, redis_port)
-    conn = redis.StrictRedis(redis_server, redis_port, charset="utf-8", decode_responses=True)
+    if redis_password is not None:
+        conn = redis.StrictRedis(redis_server, redis_port, password=redis_password, charset="utf-8", decode_responses=True)
+    else:
+        conn = redis.StrictRedis(redis_server, redis_port, charset="utf-8", decode_responses=True)
     with open(category_file_location) as xml_file:
         # create element tree object
         tree = ET.parse(xml_file)
