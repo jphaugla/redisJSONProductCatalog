@@ -121,7 +121,7 @@ def process_file(file_name):
                     nextProduct.set_parent_category_name(parent_category_name)
                     # print("previous matched prev was " + previousCatName + " prev parent " + previousParentCatName)
                 else:
-                    print("in categ else")
+                    # print("in categ else")
                     getAll = None;
                     if environ.get('WRITE_JSON') is not None and environ.get('WRITE_JSON') == "true":
                         getAll = conn.json().get(category_id)
@@ -143,7 +143,7 @@ def process_file(file_name):
             if nextProduct.quality == "ICECAT":
                 nextProduct.set_key()
                 prod_loaded += 1
-                print("prodkey " + nextProduct.key_name)
+                # print("prodkey " + nextProduct.key_name)
             # if nextProduct.product_id:
             #     productDetailFile = nextProduct.path.replace("/INT/", "/EN/")
             #     cmd = CURL_PREFIX + productDetailFile + " -o " + nextProduct.product_id + ".xml"
@@ -156,12 +156,12 @@ def process_file(file_name):
                 if nextProduct.m_prod_id:
                     if environ.get('WRITE_JSON') is not None and environ.get('WRITE_JSON') == "true":
                         title = conn.json().get("PRODID:" + nextProduct.m_prod_id, "Title")
-                        print("json found " + nextProduct.m_prod_id)
+                        # print("json found " + nextProduct.m_prod_id)
                     else:
                         title = conn.hget("PRODID:" + nextProduct.m_prod_id, "Title")
-                        print("hash found " + nextProduct.m_prod_id)
+                        # print("hash found " + nextProduct.m_prod_id)
                     if title:
-                        print("title found " + title)
+                        # print("title found " + title)
                         nextProduct.title = title
                 elif nextProduct.model_name:
                     nextProduct.title = nextProduct.model_name
