@@ -9,6 +9,8 @@ class Category(object):
         self.Score = ""
         self.ParentCategoryName = ""
         self.ParentCategoryID = ""
+        # will have GUI to remove categories from the load-default to Include
+        self.Include = "Y"
 
     def __init__(self, **kwargs):
         self.ID = None
@@ -18,6 +20,8 @@ class Category(object):
         self.Score = ""
         self.ParentCategoryName = ""
         self.ParentCategoryID = ""
+        # will have GUI to remove categories from the load-default to Include
+        self.Include = "Y"
         for key in kwargs:
             setattr(self, key, kwargs[key])
 

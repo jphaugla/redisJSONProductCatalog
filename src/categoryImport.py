@@ -12,6 +12,7 @@ REDIS_HOST = 'redis'
 
 
 def main():
+    redis_password = ""
     if environ.get('REDIS_SERVER') is not None:
         redis_server = environ.get('REDIS_SERVER')
         print("passed in redis server is " + redis_server)
@@ -25,6 +26,7 @@ def main():
     else:
         redis_port = 6379
         print("no passed in redis port variable ")
+
     if environ.get('REDIS_PASSWORD') is not None:
         redis_password = environ.get('REDIS_PASSWORD')
         print("passed in redis password is " + redis_password)

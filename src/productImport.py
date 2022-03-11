@@ -50,6 +50,10 @@ def main():
            " total time " + str(int(endTime - startTime)) + " seconds")
 
 def process_file(file_name):
+
+    redis_password = ""
+    iceCatUser = ""
+    iceCatPw = ""
     print("starting process_file with file name " + file_name)
     if environ.get('REDIS_SERVER') is not None:
         redis_server = environ.get('REDIS_SERVER')
@@ -67,8 +71,6 @@ def process_file(file_name):
     if environ.get('REDIS_PASSWORD') is not None:
         redis_password = environ.get('REDIS_PASSWORD')
         print("passed in redis password is " + redis_password)
-    iceCatUser = ""
-    iceCatPw = ""
     if environ.get('ICECAT_USER') is not None:
         iceCatUser = environ.get('ICECAT_USER')
         print("passed in iceCatUser " + iceCatUser)
@@ -107,7 +109,7 @@ def process_file(file_name):
             #  increment prod_idx and use as incremental part of the key
             prod_idx += 1
             nextProduct = Product(**row)
-            if nextProduct.catid and nextProduct.quality == "ICECAT":
+            if nextProduct.catid and nextProduct.quality == "ICECAT" and nextProduct.on_market == "1":
                 category_id = 'Category:' + nextProduct.catid
                 # print(row)
                 # print(category_id)

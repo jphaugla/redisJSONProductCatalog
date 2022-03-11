@@ -19,20 +19,24 @@ if environ.get('REDIS_SERVER') is not None:
     redis_server = environ.get('REDIS_SERVER')
     print("passed in redis server is " + redis_server)
 else:
-    redis_server = '10.0.1.35'
+    redis_server = 'localhost'
     print("no passed in redis server variable ")
 
 if environ.get('REDIS_PORT') is not None:
     redis_port = int(environ.get('REDIS_PORT'))
     print("passed in redis port is " + str(redis_port))
 else:
-    redis_port = 13000
+    redis_port = 6379
     print("no passed in redis port variable ")
+if environ.get('WRITE_JSON') is not None and environ.get('WRITE_JSON') == "true":
+    useIndexType = IndexType.JSON
+else:
+    useIndexType = IndexType.HASH
 
 db = redis.StrictRedis(redis_server, redis_port, charset="utf-8", decode_responses=True)  # connect to server
 print("beginning of appy.py now")
 
-categoryDefinition = IndexDefinition(prefix=['Category:'], index_type=IndexType.JSON)
+categoryDefinition = IndexDefinition(prefix=['Category:'], index_type=useIndexType)
 categorySCHEMA = (
     # TextField("$.LowPic", as_name='LowPic', no_stem=True, no_index=True),
     # TextField("$.ThumbPic", as_name='ThumbPic', no_stem=True, no_index=True),
@@ -40,7 +44,7 @@ categorySCHEMA = (
     TextField("$.ParentCategoryName", as_name='ParentCategoryName')
 )
 
-productDefinition = IndexDefinition(prefix=['mprodid:', 'prodid:'], index_type=IndexType.JSON)
+productDefinition = IndexDefinition(prefix=['mprodid:', 'prodid:'], index_type=useIndexType)
 productSCHEMA = (
     TextField("$.product_id", as_name='product_id', no_stem=True),
     # path and updated not needed

@@ -50,6 +50,8 @@ def main():
            " total time " + str(int(endTime - startTime)) + " seconds")
 
 def process_file(file_name):
+
+    redis_password = ""
     print("starting process_file with file name " + file_name)
     if environ.get('REDIS_SERVER') is not None:
         redis_server = environ.get('REDIS_SERVER')
@@ -87,7 +89,7 @@ def process_file(file_name):
             prod_idx += 1
             nextProduct = ProductTitle(**row)
             # print(nextProduct)
-            if nextProduct.Title and nextProduct.Quality == "ICECAT":
+            if nextProduct.Title and nextProduct.Quality == "ICECAT" and nextProduct.MarketPresence == "1":
                 prod_loaded += 1
                 subset = {k: nextProduct.__dict__[k] for k in ('Partnumber', 'Title')}
                 # print(subset)
