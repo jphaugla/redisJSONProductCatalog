@@ -82,7 +82,9 @@ def process_file(file_name):
         prod_idx = 0
         prod_loaded = 0
         #  go through all rows in the file
-
+        start_time = str(datetime.datetime.now())
+        short_file_name = os.path.basename(file_name)
+        conn.hset("prod_title_load:" + short_file_name, "start", start_time)
         for row in csv_reader:
             #  increment prod_idx and use as incremental part of the key
             # print(row)
@@ -98,7 +100,7 @@ def process_file(file_name):
                 else:
                     conn.hset("PRODID:" + nextProduct.Partnumber, mapping=subset)
                 # this write is for debug to know what line failed on
-                conn.set("prod_highest_idx" + file_name, prod_idx)
+                conn.set("prod_highest_idx" + short_file_name, prod_idx)
             # 0)path 1)product_id 2)updated 3)quality 4)supplier_id 5)prod_id 6)catid 7)m_prod_id 8)ean_upc 9)on_market
             # 10)country_market 11)model_name 12)product_view 13)high_pic 14)high_pic_size
             # 15)high_pic_width 16)high_pic_height 17)m_supplier_id 18)m_supplier_name 19)ean_upc_is_approved
@@ -112,11 +114,14 @@ def process_file(file_name):
             #     # print("model key is " + model_key)
             #     conn.sadd(model_key, nextProduct.key_name)
             if prod_idx % 50000 == 0:
-                print(str(prod_idx) + " rows from file " + file_name + " " + str(prod_loaded) + " rows added to redis")
+                print(str(prod_idx) + " rows loaded from file " + short_file_name + " " + str(prod_loaded))
+                print ("rows added from start " + start_time + " ended at " + str(datetime.datetime.now()))
         csv_file.close()
-        print(str(prod_idx) + " rows loaded " + str(prod_loaded) + " rows added to redis")
-        conn.set("prod_highest_idx", prod_idx)
-    print("Finished productTitleimport.py at " + str(datetime.datetime.now()))
+        print(str(prod_idx) + " rows loaded from file " + short_file_name + " " + str(prod_loaded))
+        print("rows added from start " + start_time + " ended at " + str(datetime.datetime.now()))
+        conn.hset("prod_title_load:" + short_file_name, "finished", str(datetime.datetime.now()))
+        conn.hset("prod_title_load:" + short_file_name, "rows_in_file", str(prod_idx))
+        conn.hset("prod_title_load:" + short_file_name, "rows_loaded", str(prod_loaded))
 
 
 def process_files_parallel(dirname, names, numProcesses: int):

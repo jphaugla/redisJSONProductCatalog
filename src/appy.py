@@ -28,47 +28,52 @@ if environ.get('REDIS_PORT') is not None:
 else:
     redis_port = 6379
     print("no passed in redis port variable ")
+#  if environment is set to write to
+#  jason change the index type and the field prefix
+#  for JSON the field prefix is $.   for hash there is none
 if environ.get('WRITE_JSON') is not None and environ.get('WRITE_JSON') == "true":
     useIndexType = IndexType.JSON
+    fieldPrefix = "$."
 else:
     useIndexType = IndexType.HASH
+    fieldPrefix = ""
 
 db = redis.StrictRedis(redis_server, redis_port, charset="utf-8", decode_responses=True)  # connect to server
 print("beginning of appy.py now")
 
 categoryDefinition = IndexDefinition(prefix=['Category:'], index_type=useIndexType)
 categorySCHEMA = (
-    # TextField("$.LowPic", as_name='LowPic', no_stem=True, no_index=True),
-    # TextField("$.ThumbPic", as_name='ThumbPic', no_stem=True, no_index=True),
-    TextField("$.Name", as_name='Name'),
-    TextField("$.ParentCategoryName", as_name='ParentCategoryName')
+    # TextField(fieldPrefix + "LowPic", as_name='LowPic', no_stem=True, no_index=True),
+    # TextField(fieldPrefix + "ThumbPic", as_name='ThumbPic', no_stem=True, no_index=True),
+    TextField(fieldPrefix + "Name", as_name='Name'),
+    TextField(fieldPrefix + "ParentCategoryName", as_name='ParentCategoryName')
 )
 
 productDefinition = IndexDefinition(prefix=['mprodid:', 'prodid:'], index_type=useIndexType)
 productSCHEMA = (
-    TextField("$.product_id", as_name='product_id', no_stem=True),
+    TextField(fieldPrefix + "product_id", as_name='product_id', no_stem=True),
     # path and updated not needed
-    # TextField("$.path", as_name='path', no_stem=True),
-    # TextField("$.updated", as_name='updated', no_stem=True),
-    TextField("$.quality", as_name='quality', no_stem=True),
-    TextField("$.supplier_id", as_name='supplier_id', no_stem=True),
-    TextField("$.prod_id", as_name='prod_id', no_stem=True),
-    TextField("$.catid", as_name='catid', no_stem=True),
-    TextField("$.m_prod_id", as_name='m_prod_id', no_stem=True),
-    TextField("$.ean_upc", as_name='ean_upc', no_stem=True),
-    TagField("$.country_market", separator=";", as_name='country_market'),
-    TextField("$.model_name", as_name='model_name', no_stem=True),
-    TextField("$.product_view", as_name='product_view', no_stem=True),
-    TextField("$.m_supplier_id", as_name='m_supplier_id', no_stem=True),
-    TextField("$.m_supplier_name", as_name='m_supplier_name'),
-    # TextField("$.high_pic", as_name='high_pic', no_stem=True, no_index=True),
-    # NumericField("$.high_pic_width", as_name='high_pic_width'),
-    # NumericField("$.high_pic_height", as_name='high_pic_height'),
-    # NumericField("$.high_pic_size", as_name='high_pic_size'),
-    TagField("$.ean_upc_is_approved", separator=";", as_name='ean_upc_is_approved'),
-    # TextField("$.Date_Added", as_name='date_added', no_stem=True),
-    TextField("$.category_name", as_name='category_name'),
-    TextField("$.parent_category_name", as_name='parent_category_name')
+    # TextField(fieldPrefix + "path", as_name='path', no_stem=True),
+    # TextField(fieldPrefix + "updated", as_name='updated', no_stem=True),
+    TextField(fieldPrefix + "quality", as_name='quality', no_stem=True),
+    TextField(fieldPrefix + "supplier_id", as_name='supplier_id', no_stem=True),
+    TextField(fieldPrefix + "prod_id", as_name='prod_id', no_stem=True),
+    TextField(fieldPrefix + "catid", as_name='catid', no_stem=True),
+    TextField(fieldPrefix + "m_prod_id", as_name='m_prod_id', no_stem=True),
+    TextField(fieldPrefix + "ean_upc", as_name='ean_upc', no_stem=True),
+    TagField(fieldPrefix + "country_market", separator=";", as_name='country_market'),
+    TextField(fieldPrefix + "model_name", as_name='model_name', no_stem=True),
+    TextField(fieldPrefix + "product_view", as_name='product_view', no_stem=True),
+    TextField(fieldPrefix + "m_supplier_id", as_name='m_supplier_id', no_stem=True),
+    TextField(fieldPrefix + "m_supplier_name", as_name='m_supplier_name'),
+    # TextField(fieldPrefix + "high_pic", as_name='high_pic', no_stem=True, no_index=True),
+    # NumericField(fieldPrefix + "high_pic_width", as_name='high_pic_width'),
+    # NumericField(fieldPrefix + "high_pic_height", as_name='high_pic_height'),
+    # NumericField(fieldPrefix + "high_pic_size", as_name='high_pic_size'),
+    TagField(fieldPrefix + "ean_upc_is_approved", separator=";", as_name='ean_upc_is_approved'),
+    # TextField(fieldPrefix + "Date_Added", as_name='date_added', no_stem=True),
+    TextField(fieldPrefix + "category_name", as_name='category_name'),
+    TextField(fieldPrefix + "parent_category_name", as_name='parent_category_name')
 )
 
 print("before try on product")
@@ -112,7 +117,10 @@ def home(path):
         nextProduct.set_key()
         # event['updated'] = int(time.time())
         # db.hmset(path, event)
-        db.json().set(nextProduct.key_name, Path.rootPath(), nextProduct.__dict__)
+        if environ.get('WRITE_JSON') is not None and environ.get('WRITE_JSON') == "true":
+            db.json().set(nextProduct.key_name, Path.rootPath(), nextProduct.__dict__)
+        else:
+            db.hset(nextProduct.key_name, mapping=nextProduct.__dict__)
         return_string = jsonify(nextProduct.__dict__, 201)
 
     elif request.method == 'DELETE':
@@ -165,7 +173,10 @@ def home(path):
             return_string = jsonify(catResults, 200)
         elif path == 'prod':
             get_prod = request.args.get("prodkey")
-            return_value = db.json().get(get_prod)
+            if environ.get('WRITE_JSON') is not None and environ.get('WRITE_JSON') == "true":
+                return_value = db.json().get(get_prod)
+            else:
+                return_value = db.get(get_prod)
             return_string = jsonify(return_value,200)
         else:
              print("in the GET before call to index.html")

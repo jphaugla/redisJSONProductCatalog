@@ -1,6 +1,20 @@
+#  PRODUCT
 ft.search Product "@catid:889" 
 ft.search Product "@catid:889" return 1 product_id
 # returns only the keyname
 ft.search Product "@catid:889" NOCONTENT
 ft.search Product "@m_supplier_name:LEXMARK" 
-ft.search Product "@m_supplier_name:LEXMARK @country_market:{GB}" return 3 country_market m_supplier_name  model_name 
+ft.search Product "@m_supplier_name:LEXMARK @country_market:{GB}" return 3 country_market m_supplier_name  model_name
+ft.search product * return 2 model_name prod_id
+ft.search product @model_name:iphone return 2 model_name prod_id
+ft.search product @m_supplier_name:HP return 2 model_name category_name
+ft.search product @category_name:Calculators return 2 model_name country_market
+ft.search product @category_name:Calculators@country_market:{GB} return 2 model_name country_market
+
+# Category
+# return all the Categories
+ft.search Category *
+# returns all the Categories for a parent
+ft.search Category "@ParentCategoryName:Computer\ Utilities"
+# finds all the Parent Categories and prints them with count of Categories for each parent
+ft.aggregate Category * GROUPBY 1 @ParentCategoryName REDUCE count 0 as numberCategories SORTBY 1 @numberCategories

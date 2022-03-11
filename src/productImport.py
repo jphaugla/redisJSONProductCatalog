@@ -52,8 +52,6 @@ def main():
 def process_file(file_name):
 
     redis_password = ""
-    iceCatUser = ""
-    iceCatPw = ""
     print("starting process_file with file name " + file_name)
     if environ.get('REDIS_SERVER') is not None:
         redis_server = environ.get('REDIS_SERVER')
@@ -71,18 +69,6 @@ def process_file(file_name):
     if environ.get('REDIS_PASSWORD') is not None:
         redis_password = environ.get('REDIS_PASSWORD')
         print("passed in redis password is " + redis_password)
-    if environ.get('ICECAT_USER') is not None:
-        iceCatUser = environ.get('ICECAT_USER')
-        print("passed in iceCatUser " + iceCatUser)
-    else:
-        print("no passed in icecat_user ")
-        exit(1)
-    if environ.get('ICECAT_PW') is not None:
-        iceCatPw = environ.get('ICECAT_PW')
-        print("passed in iceCatUPw " + iceCatPw)
-    else:
-        print("no passed in icecat_password ")
-        exit(1)
 
     if redis_password is not None:
         conn = redis.StrictRedis(redis_server, redis_port, password=redis_password, charset="utf-8",
@@ -104,7 +90,9 @@ def process_file(file_name):
         # this was not practical.  Way too slow
         # CURL_PREFIX = "curl -u " + iceCatUser + ":" + iceCatPw + " https://data.Icecat.biz/"
         # print(CURL_PREFIX)
-
+        start_time = str(datetime.datetime.now())
+        short_file_name = os.path.basename(file_name)
+        conn.hset("prod_load:" + short_file_name, "start", start_time)
         for row in csv_reader:
             #  increment prod_idx and use as incremental part of the key
             prod_idx += 1
@@ -184,11 +172,14 @@ def process_file(file_name):
             #     # print("model key is " + model_key)
             #     conn.sadd(model_key, nextProduct.key_name)
             if prod_idx % 50000 == 0:
-                print(str(prod_idx) + " rows loaded from file " + file_name + " " + str(prod_loaded) + " loaded to redis")
+                print(str(prod_idx) + " rows loaded from file " + short_file_name + " " + str(prod_loaded))
+                print ("rows added from start " + start_time + " ended at " + str(datetime.datetime.now()))
         csv_file.close()
-        print(str(prod_idx) + " rows loaded " + str(prod_loaded) + " loaded to redis")
-        conn.set("prod_highest_idx", prod_idx)
-    print("Finished productimport.py at " + str(datetime.datetime.now()))
+        print(str(prod_idx) + " rows loaded from file " + short_file_name + " " + str(prod_loaded))
+        print("rows added from start " + start_time + " ended at " + str(datetime.datetime.now()))
+        conn.hset("prod_load:" + short_file_name, "finished", str(datetime.datetime.now()))
+        conn.hset("prod_load:" + short_file_name, "rows_in_file", str(prod_idx))
+        conn.hset("prod_load:" + short_file_name, "rows_loaded", str(prod_loaded))
 
 
 def process_files_parallel(dirname, names, numProcesses: int):
