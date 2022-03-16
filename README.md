@@ -1,4 +1,4 @@
-# redisPythonProductCatalog
+# redisJSONPythonProductCatalog
 A simple product catalog solution based on icecat files
 ## Initial project setup
 Get this github code
@@ -126,6 +126,7 @@ python3 -m venv venv
 source venv/bin/activate
 ```
    * Use an environment file for locations
+   * Need to make sure the data location variables are set correctly
    * Can also set the number of concurrent processes for the client using the "PROCESSES" environment variable
 
 ```bash
@@ -136,6 +137,7 @@ source scripts/app.env
 cd src
 pip install -r requirements.txt
 python categoryImport.py
+python productTitleImport.py
 python productImport.py
 python app.py
 ```
