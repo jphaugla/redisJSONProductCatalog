@@ -118,7 +118,7 @@ def home(path):
         # event['updated'] = int(time.time())
         # db.hmset(path, event)
         if environ.get('WRITE_JSON') is not None and environ.get('WRITE_JSON') == "true":
-            db.json().set(nextProduct.key_name, Path.rootPath(), nextProduct.__dict__)
+            db.json().set(nextProduct.key_name, Path.root_path(), nextProduct.__dict__)
         else:
             db.hset(nextProduct.key_name, mapping=nextProduct.__dict__)
         return_string = jsonify(nextProduct.__dict__, 201)

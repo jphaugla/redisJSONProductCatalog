@@ -96,7 +96,7 @@ def process_file(file_name):
                 subset = {k: nextProduct.__dict__[k] for k in ('Partnumber', 'Title')}
                 # print(subset)
                 if environ.get('WRITE_JSON') is not None and environ.get('WRITE_JSON') == "true":
-                    conn.json().set("PRODID:" + nextProduct.Partnumber, Path.rootPath(), subset)
+                    conn.json().set("PRODID:" + nextProduct.Partnumber, Path.root_path(), subset)
                 else:
                     conn.hset("PRODID:" + nextProduct.Partnumber, mapping=subset)
                 # this write is for debug to know what line failed on

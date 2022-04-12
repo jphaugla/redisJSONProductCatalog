@@ -156,7 +156,7 @@ def process_file(file_name):
                 elif nextProduct.model_name:
                     nextProduct.title = nextProduct.model_name
                 if environ.get('WRITE_JSON') is not None and environ.get('WRITE_JSON') == "true":
-                    conn.json().set(nextProduct.key_name, Path.rootPath(), nextProduct.__dict__)
+                    conn.json().set(nextProduct.key_name, Path.root_path(), nextProduct.__dict__)
                 else:
                     conn.hset(nextProduct.key_name, mapping=nextProduct.__dict__)
             # 0)path 1)product_id 2)updated 3)quality 4)supplier_id 5)prod_id 6)catid 7)m_prod_id 8)ean_upc 9)on_market
