@@ -11,18 +11,9 @@ services:
       - ALLOW_EMPTY_PASSWORD=yes
     ports:
       - '6379:6379'
+      - '8001:8001'
     volumes:
       - ./redis_data:/data
-
-  insight:
-    image: "redislabs/redisinsight:latest"
-    container_name: insight
-    ports:
-      - "8001:8001"
-    volumes:
-      - ./redisinsight:/db
-    depends_on:
-      - redis
 
   flask:
     image: webapp-flask
@@ -36,12 +27,14 @@ services:
       - PRODID_FILE_LOCATION=/data/prodid
       - PROCESSES=6
       - PYTHONBUFFERED=0
-      - WRITE_JSON=false
+      - WRITE_JSON=true
+      - DO_TITLE=false
+      - FLASK_RUN_PORT=5001
     build:
       context: .
       dockerfile: Dockerfile-flask
     ports:
-      - '5000:5000'
+      - '5001:5001'
     volumes:
       - "./src/:/app"
       - "./data/:/data"

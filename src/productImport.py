@@ -143,7 +143,7 @@ def process_file(file_name):
             #     stdout, stderr = process.communicate()
             #     conn.sadd("prodToKey", nextProduct.product_id + ":" + nextProduct.key_name)
             # print("before write of product " + str(nextProduct.product_id) + " " + nextProduct.key_name)
-                if nextProduct.m_prod_id:
+                if nextProduct.m_prod_id and environ.get('DO_TITLE') is not None and environ.get('DO_TITLE') == "true":
                     if environ.get('WRITE_JSON') is not None and environ.get('WRITE_JSON') == "true":
                         title = conn.json().get("PRODID:" + nextProduct.m_prod_id, "Title")
                         # print("json found " + nextProduct.m_prod_id)

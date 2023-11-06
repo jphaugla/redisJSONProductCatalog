@@ -18,6 +18,7 @@ docker-compose up -d --build
 ## Code and File discussion
 This is an implementation of a product Catalog using data download from
  [icecat](https://iceclog.com/open-catalog-interface-oci-open-icecat-xml-and-full-icecat-xml-repositories/)
+ [redis-stack](https://redis.com/blog/introducing-redis-stack/)
 
 ### Download the datafiles to the data subdirectory
 * To download the datafiles, a free login id from icecat is required.  *WARNNING* these data files are large especially prodid_d.txt (over 4GB).
@@ -41,9 +42,8 @@ gunzip prodid_d.txt.gz
 ### Set environment
 
 The docker compose file has the environment variables set for the redis connection and the location of the data files.
-This code uses redisjson and redisearch.  The redis database must have both of these modules installed.
-As of this writing, this redismod docker image (which includes these modules) does not work on the m1 arm64 based mac.  
-Default docker-compose is set to redismod
+This code uses redisjson and redisearch.  The redis database must have both of these modules installed.  [Redis stack}(https://redis.com/blog/introducing-redis-stack/) makes this easy to work with.
+docker-compose is set to redis-stack
 
 ### load categories
 The redis node and port can be changed. The python code uses 2 environment variable REDIS_SERVER and REDIS_PORT.  The default is REDIS_SERVER=redis and REDIS_PORT=6379
@@ -51,7 +51,7 @@ The redis node and port can be changed. The python code uses 2 environment varia
 docker exec -it flask bash -c "python categoryImport.py"
 ```
 ### load Product Title
-This can take quite a long time (maybe 35 minutes).  It is possible to speed the product load by splitting the file.
+This can take quite a long time (maybe 35 minutes) and consumes quite a bit of space.  The title lookup in the product index load can be disabled by setting the *DO_TITLE* environment variable to false.   It is possible to speed the product load by splitting the file.
 The python code to load the products uses python multi-processing based on the number of files found in the data/prodid directory.
 To facilitate this splitting of the file while keeping the header row on each of the split files,
 a script is provided to split the file into chunks.  This will create the separate files in the prodid directory

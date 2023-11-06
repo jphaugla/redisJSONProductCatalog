@@ -10,7 +10,7 @@ ENV APP /app
 # RUN mkdir $APP
 WORKDIR $APP
 # Expose the port uWSGI will listen on
-EXPOSE 5000
+EXPOSE 5001
 # Copy the requirements file in order to install
 # Python dependencies
 COPY requirements.txt .
